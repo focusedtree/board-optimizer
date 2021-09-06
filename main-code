@@ -1,1 +1,49 @@
 
+import itertools
+
+board_length_ft = input("Enter the length of the boards you are buying in feet: ")
+board_length_in = int(board_length_ft) * 12
+board_space = 0
+
+
+def optimize(array):
+   i = 1
+   boards_tot = 1
+   space_used = array[0]
+   length = len(array)
+   while i <= length - 1:
+      space_used = space_used + array[i]
+      if space_used <= board_length_in:
+         i = i + 1
+      else:
+         space_used = array[i]
+         i = i + 1
+         boards_tot = boards_tot + 1
+   return boards_tot
+
+
+pieces = input("Enter the number of pieces you need: ")
+pieces = int(pieces)
+
+n = 1
+piece_list = [0]*pieces
+while n <= pieces:
+   piece_length = int(input("Enter the length of piece " + str(n) + " in inches: "))
+   piece_list[n-1] = piece_length
+   n = n+1
+
+
+list_perm = list(itertools.permutations(piece_list))
+list_length = len(list_perm)
+
+opt_list = [0]*list_length
+j = 0
+while j <= list_length-1:
+   opt_list[j] = optimize(list_perm[j])
+   j = j + 1
+
+best_list = min(opt_list)
+print("You need " + str(best_list) + " boards!")
+
+
+
