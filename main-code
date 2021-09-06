@@ -1,10 +1,10 @@
+# Currently, the program runs out of memory at around 10 boards and fails to complete. Need to find a way to not have to run through each scenario... too many iterations.
 
 import itertools
 
 board_length_ft = input("Enter the length of the boards you are buying in feet: ")
 board_length_in = int(board_length_ft) * 12
 board_space = 0
-
 
 def optimize(array):
    i = 1
@@ -21,7 +21,6 @@ def optimize(array):
          boards_tot = boards_tot + 1
    return boards_tot
 
-
 pieces = input("Enter the number of pieces you need: ")
 pieces = int(pieces)
 
@@ -31,7 +30,6 @@ while n <= pieces:
    piece_length = int(input("Enter the length of piece " + str(n) + " in inches: "))
    piece_list[n-1] = piece_length
    n = n+1
-
 
 list_perm = list(itertools.permutations(piece_list))
 list_length = len(list_perm)
