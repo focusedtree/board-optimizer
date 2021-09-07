@@ -1,4 +1,4 @@
-#The program can now handle any number of boards and see the order they need to cut their boards! The next step is to list the cuts to be made on each inndividual board.
+#The program can now handle any number of boards and users can see the order they need to cut their boards! The next step is to list the cuts to be made on each inndividual board.
 import itertools
 import random
 
