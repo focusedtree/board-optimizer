@@ -1,6 +1,7 @@
-# Currently, the program runs out of memory at around 10 boards and fails to complete. Need to find a way to not have to run through each scenario... too many iterations.
+#The program can now handle any number of boards! The next step is to assign each cut to a board so the user can see how to cut each board.
 
 import itertools
+import random
 
 board_length_ft = input("Enter the length of the boards you are buying in feet: ")
 board_length_in = int(board_length_ft) * 12
@@ -31,14 +32,29 @@ while n <= pieces:
    piece_list[n-1] = piece_length
    n = n+1
 
-list_perm = list(itertools.permutations(piece_list))
-list_length = len(list_perm)
+limit = 8*7*6*5*4*3*2
+low_limit = 8
 
-opt_list = [0]*list_length
-j = 0
-while j <= list_length-1:
-   opt_list[j] = optimize(list_perm[j])
-   j = j + 1
+if len(piece_list) <= low_limit:
+   list_perm = list(itertools.permutations(piece_list))
+   list_length = len(list_perm)
+   opt_list = [0]*list_length
+   j = 0
+   while j <= list_length - 1:
+      opt_list[j] = optimize(list_perm[j])
+      j = j + 1
+else:
+   new_list = [0]*limit
+   opt_list = [0]*limit
+   ij = 0
+   while ij <= limit-1:
+      random.shuffle(piece_list)
+      new_list[ij] = piece_list
+      ij = ij + 1
+   jj = 0
+   while jj <= limit-1:
+      opt_list[jj] = optimize(new_list[jj])
+      jj = jj + 1
 
 best_list = min(opt_list)
 print("You need " + str(best_list) + " boards!")
