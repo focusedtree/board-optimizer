@@ -1,6 +1,8 @@
-# Currently, the program runs out of memory at around 10 boards and fails to complete. Need to find a way to not have to run through each scenario... too many iterations.
+# This version of the program prints how many boards needed, as well as which cuts to make on which board. Next step GUI?
+# Also want to look at changing while loops to for loops
 
 import itertools
+import random
 
 board_length_ft = input("Enter the length of the boards you are buying in feet: ")
 board_length_in = int(board_length_ft) * 12
@@ -21,6 +23,13 @@ def optimize(array):
          boards_tot = boards_tot + 1
    return boards_tot
 
+
+def factorial(val):
+   result = val
+   for nums in range(1, val):
+      result = result * nums
+   return result
+
 pieces = input("Enter the number of pieces you need: ")
 pieces = int(pieces)
 
@@ -31,17 +40,61 @@ while n <= pieces:
    piece_list[n-1] = piece_length
    n = n+1
 
-list_perm = list(itertools.permutations(piece_list))
-list_length = len(list_perm)
+low_limit = 8
+limit = factorial(low_limit)
 
-opt_list = [0]*list_length
-j = 0
-while j <= list_length-1:
-   opt_list[j] = optimize(list_perm[j])
-   j = j + 1
+if len(piece_list) <= low_limit:
+   list_perm = list(itertools.permutations(piece_list))
+   list_length = len(list_perm)
+   opt_list = [0]*list_length
+   j = 0
+   while j <= list_length - 1:
+      opt_list[j] = optimize(list_perm[j])
+      j = j + 1
+   best_list = min(opt_list)
+   index = opt_list.index(best_list)
+   best_index = list_perm[index]
+   print(list_perm[index])
+else:
+   list_perm = [0]*limit
+   opt_list = [0]*limit
+   ij = 0
+   while ij <= limit-1:
+      random.shuffle(piece_list)
+      list_perm[ij] = piece_list
+      ij = ij + 1
+   jj = 0
+   while jj <= limit-1:
+      opt_list[jj] = optimize(list_perm[jj])
+      jj = jj + 1
+   best_list = min(opt_list)
+   index = opt_list.index(best_list)
+   best_index = list_perm[index]
 
-best_list = min(opt_list)
 print("You need " + str(best_list) + " boards!")
 
-
-
+n = 0
+board_count = 1
+tot_length = 0
+board_mat = []
+while n < len(best_index):
+   tot_length = tot_length + best_index[n]
+   if tot_length <= board_length_in and n != len(best_index)-1:
+      board_mat.append(best_index[n])
+      n = n + 1
+   elif tot_length > board_length_in and n != len(best_index)-1:
+      print("Cut sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+      board_count = board_count + 1
+      tot_length = best_index[n]
+      board_mat = [best_index[n]]
+      n = n + 1
+   elif tot_length <= board_length_in and n == len(best_index)-1:
+      board_mat.append(best_index[n])
+      print("Cut sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+      n = n + 1
+   elif tot_length > board_length_in and n == len(best_index)-1:
+      print("Cut sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+      board_count = board_count + 1
+      board_mat = [best_index[n]]
+      print("Cut sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+      n = n + 1
