@@ -1,47 +1,115 @@
-# Currently, the program runs out of memory at around 10 boards and fails to complete. Need to find a way to not have to run through each scenario... too many iterations.
+# Add board length options
+# Add board prices
+# Add 1/8" waste
+# Add GUI
 
 import itertools
+import random
 
-board_length_ft = input("Enter the length of the boards you are buying in feet: ")
-board_length_in = int(board_length_ft) * 12
-board_space = 0
 
 def optimize(array):
-   i = 1
-   boards_tot = 1
-   space_used = array[0]
-   length = len(array)
-   while i <= length - 1:
-      space_used = space_used + array[i]
-      if space_used <= board_length_in:
-         i = i + 1
-      else:
-         space_used = array[i]
-         i = i + 1
-         boards_tot = boards_tot + 1
-   return boards_tot
+    boards_tot = 1
+    space_used = array[0]
+    for i in array:
+        space_used = space_used + i
+        if space_used > board_length_in:
+            space_used = i
+            boards_tot = boards_tot + 1
+    return boards_tot
 
-pieces = input("Enter the number of pieces you need: ")
-pieces = int(pieces)
+
+def factorial(val):
+    result = val
+    for nums in range(1, val):
+        result = result * nums
+    return result
+
+
+b = 0
+while b != 1:
+    board_length_ft = int(input("Enter the length of the boards you are buying in feet: "))
+    if board_length_ft > 0:
+        board_length_in = int(board_length_ft) * 12
+        board_space = 0
+        b = 1
+    else:
+        print("Please enter a positive number.")
+
+
+p = 0
+while p != 1:
+    pieces = int(input("Enter the number of pieces you need: "))
+    if pieces > 0:
+        piece_list = [0] * pieces
+        p = 1
+    else:
+        print("Please enter a positive number.")
+
 
 n = 1
-piece_list = [0]*pieces
 while n <= pieces:
-   piece_length = int(input("Enter the length of piece " + str(n) + " in inches: "))
-   piece_list[n-1] = piece_length
-   n = n+1
+    piece_length = int(input("Enter the length of piece " + str(n) + " in inches: "))
+    if piece_length > 0 and piece_length <= board_length_in:
+        piece_list[n - 1] = piece_length
+        n = n + 1
+    else:
+        print("Piece length must be greater than zero, and less than or equal to the board length.")
 
-list_perm = list(itertools.permutations(piece_list))
-list_length = len(list_perm)
+low_limit = 8
+limit = factorial(low_limit)
 
-opt_list = [0]*list_length
-j = 0
-while j <= list_length-1:
-   opt_list[j] = optimize(list_perm[j])
-   j = j + 1
+if len(piece_list) <= low_limit:
+    list_perm = list(itertools.permutations(piece_list))
+    list_length = len(list_perm)
+    opt_list = [0] * list_length
+    j = 0
+    while j <= list_length - 1:
+        opt_list[j] = optimize(list_perm[j])
+        j = j + 1
+    best_list = min(opt_list)
+    index = opt_list.index(best_list)
+    best_index = list_perm[index]
+    print(list_perm[index])
+else:
+    list_perm = [0] * limit
+    opt_list = [0] * limit
+    ij = 0
+    while ij <= limit - 1:
+        random.shuffle(piece_list)
+        list_perm[ij] = piece_list
+        ij = ij + 1
+    jj = 0
+    while jj <= limit - 1:
+        opt_list[jj] = optimize(list_perm[jj])
+        jj = jj + 1
+    best_list = min(opt_list)
+    index = opt_list.index(best_list)
+    best_index = list_perm[index]
 
-best_list = min(opt_list)
 print("You need " + str(best_list) + " boards!")
 
-
-
+n = 0
+board_count = 1
+tot_length = 0
+board_mat = []
+while n < len(best_index):
+    tot_length = tot_length + best_index[n]
+    if tot_length <= board_length_in and n != len(best_index) - 1:
+        board_mat.append(best_index[n])
+        n = n + 1
+    elif tot_length > board_length_in and n != len(best_index) - 1:
+        print("Cut sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+        board_count = board_count + 1
+        tot_length = best_index[n]
+        board_mat = [best_index[n]]
+        n = n + 1
+    elif tot_length <= board_length_in and n == len(best_index) - 1:
+        board_mat.append(best_index[n])
+        print("CUT sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+        n = n + 1
+    elif tot_length > board_length_in and n == len(best_index) - 1:
+        print("CUT sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+        board_count = board_count + 1
+        board_mat = [best_index[n]]
+        print("Cut sections of the following lengths from Board " + str(board_count) + ": " + str(board_mat)[1:-1])
+        n = n + 1
